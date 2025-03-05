@@ -43,7 +43,7 @@ router.post("/add", async (req, res) => {
 })
 
 
-router.post("/update", async (req, res) => {
+router.put("/update", async (req, res) => {
     try{
         let body = req.body;
         let updates = {};

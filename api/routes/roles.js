@@ -1,0 +1,140 @@
+const express = require("express");
+const router = express.Router();
+
+const Roles = require("../db/models/Roles");
+const RolePrivileges = require("../db/models/RolePrivileges");
+const role_privileges = require("../config/role_privileges");
+const Response = require("../lib/Response");
+const CustomError = require("../lib/Error");
+const Enum = require("../config/Enum");
+
+
+router.get("/", async (req, res) => {
+    try {
+        
+        let roles = await Roles.find({});
+
+        res.json(Response.successResponse( roles ));
+
+    } catch (err) {
+        let errorResponse = Response.errorResponse(err);
+        res.status(errorResponse.code).json(errorResponse);
+    }
+})
+
+
+router.post("/add", async (req, res) => {
+    let body = req.body;
+    try {
+        if (!body.role_name) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "role name is required");
+        if (!body.permissions || !Array.isArray(body.permissions) || body.permissions.length == 0) {
+            throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "permissions field must be an array");
+        } 
+            
+
+        let role = new Roles({
+            role_name: body.role_name,
+            is_active: true,
+            created_by: req.user?._id
+        });
+
+        await role.save();
+
+
+    for (let i = 0; i < body.permissions.length; i++ ) {
+        let priv  = new RolePrivileges({
+            role_id: role._id,
+            permission: body.permissions[i],
+            created_by: req.user?._id
+        })
+        await priv.save();
+    }
+        
+
+        res.status(Enum.HTTP_CODES.CREATED).json(Response.successResponse({ success: true }));
+        
+    } catch (err) {
+        let errorResponse = Response.errorResponse(err);
+        res.status(errorResponse.code).json(errorResponse);
+    }
+})
+
+
+router.put("/update", async (req, res) => {
+    let body = req.body;
+    try {
+        if (!body._id) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "_id field is required");
+        
+        let updates = {}
+        
+        if(body.role_name) updates.role_name = body.role_name;
+        if(typeof body.is_active === "boolean") updates.is_active = body.is_active;
+
+        await Roles.updateOne({ _id: body._id }, updates);
+
+        if (body.permissions && Array.isArray(body.permissions) && body.permissions.length > 0 ) {
+
+            let permissons = await RolePrivileges.find({ role_id: body._id });
+
+            // body.permissions => ["user_view", "category_view"]
+            // permissons => [{"role_id": "123", "permission": "user_add", _id: "234"}]
+
+            let deletedPermissions = permissons.filter(p => !body.permissions.includes(p.permission)); 
+            let newPermissions = body.permissions.filter(p => !permissons.map(p => p.permission).includes(p));
+
+            if ( deletedPermissions.length > 0 ) {
+                await RolePrivileges.deleteMany({ _id: {$in: deletedPermissions.map(p => p._id)}});
+            }
+
+            if ( newPermissions.length > 0 ) {
+                for (let i = 0; i < newPermissions.length; i++) {
+                    let priv = new RolePrivileges({
+                        role_id: body._id,
+                        permission: newPermissions[i],
+                        created_by: req.user?._id
+                    })
+
+                    await priv.save();
+                }
+            }
+
+        }
+            
+        res.json(Response.successResponse({ success: true }));
+        
+    } catch (err) {
+        let errorResponse = Response.errorResponse(err);
+        res.status(errorResponse.code).json(errorResponse);
+    }
+})
+
+
+router.delete("/delete", async (req, res) => {
+    let body = req.body;
+    try{
+
+        if (!body._id) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "_id field is required");
+        
+        await Roles.deleteOne({_id: body._id});
+
+        res.json(Response.successResponse({ success: true }));
+
+    } catch (err) {
+        let errorResponse = Response.errorResponse(err);
+        res.status(errorResponse.code).json(errorResponse);
+    }
+})
+
+
+router.get("/role_privileges", async (req, res) => {
+    try {
+
+        res.json(Response.successResponse({ role_privileges }));
+
+    } catch (err) {
+        let errorResponse = Response.errorResponse(err);
+        res.status(errorResponse.code).json(errorResponse);
+    }
+})
+
+module.exports = router;
