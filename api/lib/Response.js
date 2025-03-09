@@ -29,7 +29,7 @@ class Response {
                 code: Enum.HTTP_CODES.CONFLICT,
                 error: {
                     message: "Already Exists!",
-                    description: "Duplication Error For Role!"
+                    description: "Duplication Error!"
                 }
             }
         } 
