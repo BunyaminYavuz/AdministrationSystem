@@ -4,6 +4,7 @@ const Categories = require("../db/models/Categories");
 const Response = require("../lib/Response");
 const Enum = require("../config/Enum");
 const CustomError = require("../lib/Error");
+const AudiLogs = require("../lib/AuditLogs");
 
 router.get("/", async (req, res) => {
     try {
@@ -34,6 +35,8 @@ router.post("/add", async (req, res) => {
 
         await category.save();
 
+        AudiLogs.info(req.user?.email, "Category", "Add", { category });
+
         res.status(Enum.HTTP_CODES.CREATED).json(Response.successResponse( category ));
 
     } catch (err) {
@@ -55,6 +58,8 @@ router.put("/update", async (req, res) => {
 
         await Categories.updateOne({_id: body._id}, updates);
 
+        AudiLogs.info(req.user?.email, "Category", "Update", { _id: body._id, ...updates });
+
         res.json(Response.successResponse({ success: true }));
 
     } catch (err) {
@@ -72,6 +77,8 @@ router.delete("/delete", async (req, res) => {
         if (!body._id) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "_id field must be filled");
         
         await Categories.deleteOne({_id: body._id});
+
+        AudiLogs.info(req.user?.email, "Category", "Delete", { _id: body._id });
 
         res.json(Response.successResponse({ success: true }));
 
