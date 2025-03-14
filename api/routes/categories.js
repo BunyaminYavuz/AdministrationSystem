@@ -5,6 +5,7 @@ const Response = require("../lib/Response");
 const Enum = require("../config/Enum");
 const CustomError = require("../lib/Error");
 const AudiLogs = require("../lib/AuditLogs");
+const logger = require("../lib/logger/LoggerClass");
 
 router.get("/", async (req, res) => {
     try {
@@ -35,11 +36,13 @@ router.post("/add", async (req, res) => {
 
         await category.save();
 
-        AudiLogs.info(req.user?.email, "Category", "Add", { category });
+        AudiLogs.info(req.user?.email, "Categories", "Add", category );
+        logger.info(req.user?.email, "Categories", "Add", category);
 
         res.status(Enum.HTTP_CODES.CREATED).json(Response.successResponse( category ));
 
     } catch (err) {
+        logger.error(req.user?.email, "Categories", "Add", err);
         let errorResponse = Response.errorResponse(err);
         res.status(errorResponse.code).json(errorResponse);
     }
