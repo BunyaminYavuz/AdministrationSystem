@@ -1,5 +1,5 @@
-const Enum = require("../config/Enum")
-const CustomError = require("./Error")
+const Enum = require("../config/Enum");
+const CustomError = require("./Error");
 
 class Response {
 
@@ -9,7 +9,7 @@ class Response {
         return {
             code,
             data
-        }
+        };
     }
 
 
@@ -22,7 +22,7 @@ class Response {
                     message: error.message,
                     description: error.description
                 }
-            }
+            };
 
         } else if ( error.message.includes("E11000") ) {
             return {
@@ -31,7 +31,7 @@ class Response {
                     message: "Already Exists!",
                     description: "Duplication Error!"
                 }
-            }
+            };
         } 
 
         return {
@@ -40,9 +40,9 @@ class Response {
                 message: "Unknown Error!",
                 description: error.message
             }
-        }
+        };
 
     }
 }
 
-module.exports = Response
+module.exports = Response;

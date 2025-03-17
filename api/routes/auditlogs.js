@@ -9,17 +9,17 @@ router.post ("/", async (req, res) => {
     
     try {
 
-        let body = req.body
-        let query = {}
+        let body = req.body;
+        let query = {};
 
         let limit = body.limit;
         let skip = body.skip;
 
-        if (typeof skip !== "numeric") {
+        if (typeof skip !== "number") {
             skip = 0;
         }
 
-        if (typeof limit !== "numeric" || limit > 500) {
+        if (typeof limit !== "number" || limit > 500) {
             limit = 500;
         }
 
@@ -27,12 +27,12 @@ router.post ("/", async (req, res) => {
             query.created_at = {
                 $gte: moment(body.begin_date),
                 $lte: moment(body.end_date)
-            }
+            };
         } else {
             query.created_at = {
                 $gte: moment().subtract(1, "day").startOf("day"),
                 $lte: moment()
-            }
+            };
         }
 
 
@@ -44,6 +44,6 @@ router.post ("/", async (req, res) => {
         let errorResponse = Response.errorResponse(err);
         res.status(errorResponse.code).json(errorResponse);
     }
-})
+});
 
 module.exports = router;

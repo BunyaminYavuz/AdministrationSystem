@@ -7,7 +7,7 @@ const CustomError = require("../lib/Error");
 const AudiLogs = require("../lib/AuditLogs");
 const logger = require("../lib/logger/LoggerClass");
 
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
     try {
         let categories = await Categories.find({});
 
@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
         let errorResponse = Response.errorResponse(err);
         res.status(errorResponse.code).json(errorResponse);
     }
-})
+});
 
 
 
@@ -32,7 +32,7 @@ router.post("/add", async (req, res) => {
             name: body.name,
             is_active: true,
             created_by: req.user?._id
-        })
+        });
 
         await category.save();
 
@@ -46,7 +46,7 @@ router.post("/add", async (req, res) => {
         let errorResponse = Response.errorResponse(err);
         res.status(errorResponse.code).json(errorResponse);
     }
-})
+});
 
 
 router.put("/update", async (req, res) => {
@@ -69,7 +69,7 @@ router.put("/update", async (req, res) => {
         let errorResponse = Response.errorResponse(err);
         res.status(errorResponse.code).json(errorResponse);
     }
-})
+});
 
 
 
@@ -89,7 +89,7 @@ router.delete("/delete", async (req, res) => {
         let errorResponse = Response.errorResponse(err);
         res.status(errorResponse.code).json(errorResponse);
     }
-})
+});
 
 
 module.exports = router;
