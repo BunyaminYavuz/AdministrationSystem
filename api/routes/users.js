@@ -20,7 +20,7 @@ router.get("/", async (req, res) => {
     let errorResponse = Response.errorResponse(err);
     res.status(errorResponse.code).json(errorResponse);
   }
-})
+});
 
 
 router.post("/add", async (req, res) => {
@@ -65,13 +65,13 @@ router.post("/add", async (req, res) => {
       first_name: body.first_name,
       last_name: body.last_name,
       phone_number: body.phone_number
-    })
+    });
 
     for ( let i = 0; i < roles.length; i++ ) {
       await UserRoles.create({
         role_id: roles[i]._id,
         user_id: user._id
-      })
+      });
     }
 
     res.status(Enum.HTTP_CODES.CREATED).json(Response.successResponse( { success: true }, Enum.HTTP_CODES.CREATED));
@@ -80,14 +80,14 @@ router.post("/add", async (req, res) => {
     let errorResponse = Response.errorResponse(err);
     res.status(errorResponse.code).json(errorResponse);
   }
-})
+});
 
 
 router.put("/update", async (req, res) => {
   let body = req.body;
 
   try {
-    let updates = {}
+    let updates = {};
     if ( !body._id ) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "_id field is required");
     if ( body.password && body.password.length < Enum.PASSWORD_LENGTH ) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", `Password must be at least ${Enum.PASSWORD_LENGTH} characters`);
 
@@ -133,7 +133,7 @@ router.put("/update", async (req, res) => {
     let errorResponse = Response.errorResponse(err);
     res.status(errorResponse.code).json(errorResponse);
   }
-})
+});
 
 
 router.delete("/delete", async (req, res) => {
@@ -151,7 +151,7 @@ router.delete("/delete", async (req, res) => {
     let errorResponse = Response.errorResponse(err);
     res.status(errorResponse.code).json(errorResponse);
   }
-})
+});
 
 
 router.post("/register", async (req, res) => {
@@ -159,7 +159,7 @@ router.post("/register", async (req, res) => {
 
   try {
 
-    let user = await Users.findOne({})
+    let user = await Users.findOne({});
 
     if (user) {
       return res.sendStatus(Enum.HTTP_CODES.NOT_FOUND);
@@ -209,7 +209,7 @@ router.post("/register", async (req, res) => {
         await UserRoles.create({
           role_id: body.role_id[i],
           user_id: createdUser._id
-        })
+        });
       }
     }
 
@@ -219,6 +219,6 @@ router.post("/register", async (req, res) => {
     let errorResponse = Response.errorResponse(err);
     res.status(errorResponse.code).json(errorResponse);
   }
-})
+});
 
 module.exports = router;

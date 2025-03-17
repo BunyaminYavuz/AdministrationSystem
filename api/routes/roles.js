@@ -20,7 +20,7 @@ router.get("/", async (req, res) => {
         let errorResponse = Response.errorResponse(err);
         res.status(errorResponse.code).json(errorResponse);
     }
-})
+});
 
 
 router.post("/add", async (req, res) => {
@@ -46,7 +46,7 @@ router.post("/add", async (req, res) => {
             role_id: role._id,
             permission: body.permissions[i],
             created_by: req.user?._id
-        })
+        });
         await priv.save();
     }
         
@@ -57,7 +57,7 @@ router.post("/add", async (req, res) => {
         let errorResponse = Response.errorResponse(err);
         res.status(errorResponse.code).json(errorResponse);
     }
-})
+});
 
 
 router.put("/update", async (req, res) => {
@@ -65,7 +65,7 @@ router.put("/update", async (req, res) => {
     try {
         if (!body._id) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "_id field is required");
         
-        let updates = {}
+        let updates = {};
         
         if(body.role_name) updates.role_name = body.role_name;
         if(typeof body.is_active === "boolean") updates.is_active = body.is_active;
@@ -92,7 +92,7 @@ router.put("/update", async (req, res) => {
                         role_id: body._id,
                         permission: newPermissions[i],
                         created_by: req.user?._id
-                    })
+                    });
 
                     await priv.save();
                 }
@@ -106,7 +106,7 @@ router.put("/update", async (req, res) => {
         let errorResponse = Response.errorResponse(err);
         res.status(errorResponse.code).json(errorResponse);
     }
-})
+});
 
 
 router.delete("/delete", async (req, res) => {
@@ -123,7 +123,7 @@ router.delete("/delete", async (req, res) => {
         let errorResponse = Response.errorResponse(err);
         res.status(errorResponse.code).json(errorResponse);
     }
-})
+});
 
 
 router.get("/role_privileges", async (req, res) => {
@@ -135,6 +135,6 @@ router.get("/role_privileges", async (req, res) => {
         let errorResponse = Response.errorResponse(err);
         res.status(errorResponse.code).json(errorResponse);
     }
-})
+});
 
 module.exports = router;
