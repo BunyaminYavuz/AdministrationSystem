@@ -14,7 +14,7 @@ router.all("*", auth.authenticate(), (req, res, next) => {
 });
 
 
-router.get("/", async (req, res) => {
+router.get("/", auth.checkRoles("role_view"), async (req, res) => {
     try {
         
         let roles = await Roles.find({});
@@ -28,7 +28,7 @@ router.get("/", async (req, res) => {
 });
 
 
-router.post("/add", async (req, res) => {
+router.post("/add", auth.checkRoles("role_add"), async (req, res) => {
     let body = req.body;
     try {
         if (!body.role_name) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "role name is required");
@@ -65,7 +65,7 @@ router.post("/add", async (req, res) => {
 });
 
 
-router.put("/update", async (req, res) => {
+router.put("/update", auth.checkRoles("role_update"), async (req, res) => {
     let body = req.body;
     try {
         if (!body._id) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "_id field is required");
@@ -114,7 +114,7 @@ router.put("/update", async (req, res) => {
 });
 
 
-router.delete("/delete", async (req, res) => {
+router.delete("/delete", auth.checkRoles("role_delete"), async (req, res) => {
     let body = req.body;
     try{
 
@@ -131,7 +131,7 @@ router.delete("/delete", async (req, res) => {
 });
 
 
-router.get("/role_privileges", async (req, res) => {
+router.get("/role_privileges", auth.checkRoles("role_view"), async (req, res) => {
     try {
 
         res.json(Response.successResponse({ role_privileges }));

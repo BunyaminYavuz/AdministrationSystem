@@ -124,7 +124,7 @@ router.all("*", auth.authenticate(), (req, res, next) => {
 
 
 /* GET users listing. */
-router.get("/", async (req, res) => {
+router.get("/", auth.checkRoles("user_view"), async (req, res) => {
   try {
     let users = await Users.find({});
 
@@ -136,7 +136,7 @@ router.get("/", async (req, res) => {
 });
 
 
-router.post("/add", async (req, res) => {
+router.post("/add", auth.checkRoles("user_add"), async (req, res) => {
   let body = req.body;
 
   try {
@@ -196,7 +196,7 @@ router.post("/add", async (req, res) => {
 });
 
 
-router.put("/update", async (req, res) => {
+router.put("/update", auth.checkRoles("user_update"), async (req, res) => {
   let body = req.body;
 
   try {
@@ -249,7 +249,7 @@ router.put("/update", async (req, res) => {
 });
 
 
-router.delete("/delete", async (req, res) => {
+router.delete("/delete", auth.checkRoles("user_delete"), async (req, res) => {
   let body = req.body;
 
   try {
