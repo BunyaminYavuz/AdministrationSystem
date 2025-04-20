@@ -7,7 +7,9 @@ const role_privileges = require("../config/role_privileges");
 const Response = require("../lib/Response");
 const CustomError = require("../lib/Error");
 const Enum = require("../config/Enum");
+const config = require("../config");
 const auth = require("../lib/auth")();
+const i18n = new (require("../lib/i18n"))(config.DEFAULT_LANG);
 
 router.all("*", auth.authenticate(), (req, res, next) => {
     next();
@@ -22,7 +24,7 @@ router.get("/", auth.checkRoles("role_view"), async (req, res) => {
         res.json(Response.successResponse( roles ));
 
     } catch (err) {
-        let errorResponse = Response.errorResponse(err);
+        let errorResponse = Response.errorResponse(err, req.user.language);
         res.status(errorResponse.code).json(errorResponse);
     }
 });
@@ -31,9 +33,9 @@ router.get("/", auth.checkRoles("role_view"), async (req, res) => {
 router.post("/add", auth.checkRoles("role_add"), async (req, res) => {
     let body = req.body;
     try {
-        if (!body.role_name) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "role name is required");
+        if (!body.role_name) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, i18n.translate("COMMON.VALIDATION_ERROR_TITLE", req.user.language), i18n.translate("COMMON.FIELD_MUST_BE_FILLED", req.user.language, ["role_name"]));
         if (!body.permissions || !Array.isArray(body.permissions) || body.permissions.length == 0) {
-            throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "permissions field must be an array");
+            throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST,  i18n.translate("COMMON.VALIDATION_ERROR_TITLE", req.user.language), i18n.translate("COMMON.FIELD_MUST_BE_ARRAY", req.user.language, ["permissions", "Array"]));
         } 
             
 
@@ -59,7 +61,7 @@ router.post("/add", auth.checkRoles("role_add"), async (req, res) => {
         res.status(Enum.HTTP_CODES.CREATED).json(Response.successResponse({ success: true }));
         
     } catch (err) {
-        let errorResponse = Response.errorResponse(err);
+        let errorResponse = Response.errorResponse(err, req.user.language);
         res.status(errorResponse.code).json(errorResponse);
     }
 });
@@ -68,7 +70,7 @@ router.post("/add", auth.checkRoles("role_add"), async (req, res) => {
 router.put("/update", auth.checkRoles("role_update"), async (req, res) => {
     let body = req.body;
     try {
-        if (!body._id) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "_id field is required");
+        if (!body._id) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST,  i18n.translate("COMMON.VALIDATION_ERROR_TITLE", req.user.language), i18n.translate("COMMON.FIELD_MUST_BE_FILLED", req.user.language, ["_id"]));
         
         let updates = {};
         
@@ -108,7 +110,7 @@ router.put("/update", auth.checkRoles("role_update"), async (req, res) => {
         res.json(Response.successResponse({ success: true }));
         
     } catch (err) {
-        let errorResponse = Response.errorResponse(err);
+        let errorResponse = Response.errorResponse(err, req.user.language);
         res.status(errorResponse.code).json(errorResponse);
     }
 });
@@ -118,14 +120,14 @@ router.delete("/delete", auth.checkRoles("role_delete"), async (req, res) => {
     let body = req.body;
     try{
 
-        if (!body._id) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "_id field is required");
+        if (!body._id) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST,  i18n.translate("COMMON.VALIDATION_ERROR_TITLE", req.user.language), i18n.translate("COMMON.FIELD_MUST_BE_FILLED", req.user.language, ["_id"]));
         
         await Roles.deleteOne({_id: body._id});
 
         res.json(Response.successResponse({ success: true }));
 
     } catch (err) {
-        let errorResponse = Response.errorResponse(err);
+        let errorResponse = Response.errorResponse(err, req.user.language);
         res.status(errorResponse.code).json(errorResponse);
     }
 });
@@ -137,7 +139,7 @@ router.get("/role_privileges", auth.checkRoles("role_view"), async (req, res) =>
         res.json(Response.successResponse({ role_privileges }));
 
     } catch (err) {
-        let errorResponse = Response.errorResponse(err);
+        let errorResponse = Response.errorResponse(err, req.user.language);
         res.status(errorResponse.code).json(errorResponse);
     }
 });

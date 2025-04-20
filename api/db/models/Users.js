@@ -3,6 +3,7 @@ const is = require("is_js");
 const bcrypt = require("bcrypt");
 const { PASSWORD_LENGTH, HTTP_CODES } = require("../../config/Enum");
 const CustomError = require("../../lib/Error");
+const { DEFAULT_LANG } = require("../../config");
 
 const schema = mongoose.Schema({
     email: {
@@ -20,7 +21,11 @@ const schema = mongoose.Schema({
         },
     first_name: String,
     last_name: String,
-    phone_number: String
+    phone_number: String,
+    language: {
+        type: String,
+        default: DEFAULT_LANG
+    }
 },
     {
     versionKey: false,
