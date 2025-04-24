@@ -10,6 +10,8 @@ const config = require("../config");
 const auth = require("../lib/auth")();
 const i18n = new (require("../lib/i18n"))(config.DEFAULT_LANG);
 const emitter = require("../lib/Emitter");
+const exportExcel = new (require("../lib/Export"))();
+const fs = require("fs");
 
 router.all("*", auth.authenticate(), (req, res, next) => {
     next();
@@ -39,7 +41,7 @@ router.post("/add", auth.checkRoles("category_add"), async (req, res) => {
         let category = new Categories({
             name: body.name,
             is_active: true,
-            created_by: req.user?._id
+            created_by: req.user.id
         });
 
         await category.save();
@@ -100,5 +102,32 @@ router.delete("/delete", auth.checkRoles("category_delete"), async (req, res) =>
     }
 });
 
+
+router.post("/export", auth.checkRoles("category_export"), async (req, res) => {
+    try {
+        let categories = await Categories.find({});
+
+        let excel = exportExcel.toExcel(
+            ["ID", "NAME", "IS ACTIVE?", "USER ID", "CREATED AT", "UPDATED AT"],
+            ["id", "name", "is_active", "created_by", "created_at", "updated_at"],
+            categories
+        );
+
+
+        let filePath = __dirname + "/../tmp/categories_excel_" + Date.now() + ".xlsx";
+
+        fs.writeFileSync(filePath, excel, "UTF-8");
+
+        res.download(filePath, () => {
+            fs.unlink(filePath, (err) => {
+                if (err) console.error("File deletion error:", err);
+            });
+        });
+
+    } catch (err) {
+        let errorResponse = Response.errorResponse(err, req.user.language);
+        res.status(errorResponse.code).json(errorResponse);
+    }
+});
 
 module.exports = router;
