@@ -42,7 +42,7 @@ router.post("/add", auth.checkRoles("role_add"), async (req, res) => {
         let role = new Roles({
             role_name: body.role_name,
             is_active: true,
-            created_by: req.user?._id
+            created_by: req.user?.id
         });
 
         await role.save();
@@ -52,7 +52,7 @@ router.post("/add", auth.checkRoles("role_add"), async (req, res) => {
         let priv  = new RolePrivileges({
             role_id: role._id,
             permission: body.permissions[i],
-            created_by: req.user?._id
+            created_by: req.user?.id
         });
         await priv.save();
     }
@@ -98,7 +98,7 @@ router.put("/update", auth.checkRoles("role_update"), async (req, res) => {
                     let priv = new RolePrivileges({
                         role_id: body._id,
                         permission: newPermissions[i],
-                        created_by: req.user?._id
+                        created_by: req.user?.id
                     });
 
                     await priv.save();
