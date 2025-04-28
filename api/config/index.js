@@ -7,5 +7,6 @@ module.exports = {
         "SECRET": process.env.JWT_SECRET_KEY || "secret_key",
         "EXPIRE_TIME": !isNaN(parseInt(process.env.JWT_TOKEN_EXPIRE_TIME)) ? parseInt(process.env.JWT_TOKEN_EXPIRE_TIME) : 24 * 60 * 60,
     },
-    "DEFAULT_LANG": process.env.DEFAULT_LANG || "EN"
+    "DEFAULT_LANG": process.env.DEFAULT_LANG || "EN",
+    "FILE_UPLOAD_PATH": process.env.FILE_UPLOAD_PATH
 };
