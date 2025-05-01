@@ -11,6 +11,7 @@ const Users = require("../db/models/Users");
 const UserRoles = require('../db/models/UserRoles');
 const Roles = require('../db/models/Roles');
 const config = require("../config");
+const RolePrivileges = require('../db/models/RolePrivileges');
 const auth = require("../lib/auth")();
 const i18n = new (require("../lib/i18n"))(config.DEFAULT_LANG);
 
@@ -128,7 +129,12 @@ router.all("*", auth.authenticate(), (req, res, next) => {
 /* GET users listing. */
 router.get("/", auth.checkRoles("user_view"), async (req, res) => {
   try {
-    let users = await Users.find({}, {password: 0});
+    let users = await Users.find({}, {password: 0}).lean();
+
+    for (let i = 0; i < users.length; i++) {
+      let roles = await UserRoles.find({ user_id: users[i]._id }).populate("role_id");
+      users[i].roles = roles;
+    }
 
     res.json(Response.successResponse( users ));
   } catch (err) {
