@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
-const is = require("is_js");
+const validator = require('validator');
 const jwt = require("jsonwebtoken");
 
 const Response = require('../lib/Response');
@@ -29,7 +29,7 @@ router.post("/register", async (req, res) => {
         throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "Email is required");
     }
     
-    if (is.not.email(body.email)) {
+    if (!validator.isEmail(body.email)) {
         throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "Email must be in a valid format");
     }
     
@@ -146,7 +146,7 @@ router.post("/add", auth.checkRoles("user_add"), async (req, res) => {
         throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, i18n.translate("COMMON.VALIDATION_ERROR_TITLE", req.user.language), i18n.translate("COMMON.FIELD_MUST_BE_FILLED", req.user.language, ["email"]));
     }
     
-    if (is.not.email(body.email)) {
+    if (!validator.isEmail(body.email)) {
         throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, i18n.translate("COMMON.VALIDATION_ERROR_TITLE", req.user.language), i18n.translate("USERS.FIELD_VALID_FORMAT", req.user.language, ["email", "email"]));
     }
     
