@@ -128,7 +128,7 @@ router.all("*", auth.authenticate(), (req, res, next) => {
 /* GET users listing. */
 router.get("/", auth.checkRoles("user_view"), async (req, res) => {
   try {
-    let users = await Users.find({});
+    let users = await Users.find({}, {password: 0});
 
     res.json(Response.successResponse( users ));
   } catch (err) {
