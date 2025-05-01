@@ -69,7 +69,7 @@ module.exports = function() {
             return (req, res, next) => {
 
                 let i = 0;
-                let privileges = req.user.roles.map(ur => ur.key);
+                let privileges = req.user.roles.filter(r => r).map(ur => ur.key);
 
                 // Iterate through expected roles; if none match user's privileges, access is denied
                 while(i <= expectedRoles.length && !privileges.includes(expectedRoles[i])) i++;
