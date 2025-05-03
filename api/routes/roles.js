@@ -8,6 +8,7 @@ const Response = require("../lib/Response");
 const CustomError = require("../lib/Error");
 const Enum = require("../config/Enum");
 const config = require("../config");
+const UserRoles = require("../db/models/UserRoles");
 const auth = require("../lib/auth")();
 const i18n = new (require("../lib/i18n"))(config.DEFAULT_LANG);
 
@@ -77,13 +78,19 @@ router.put("/update", auth.checkRoles("role_update"), async (req, res) => {
     try {
         if (!body._id) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST,  i18n.translate("COMMON.VALIDATION_ERROR_TITLE", req.user.language), i18n.translate("COMMON.FIELD_MUST_BE_FILLED", req.user.language, ["_id"]));
         
+        let userRole = await UserRoles.findOne({ user_id: req.user.id, role_id: body._id });
+                
+        if (userRole) {
+            throw new CustomError(Enum.HTTP_CODES.FORBIDDEN, i18n.translate("COMMON.UNAUTHORIZED_ACCESS", req.user.language), i18n.translate("COMMON.UNAUTHORIZED_ACCESS", req.user.language)); // No self-privilege escalation
+        }
+
         let updates = {};
         
         if(body.role_name) updates.role_name = body.role_name;
         if(typeof body.is_active === "boolean") updates.is_active = body.is_active;
 
         await Roles.updateOne({ _id: body._id }, updates);
-
+  
         if (body.permissions && Array.isArray(body.permissions) && body.permissions.length > 0 ) {
 
             let permissons = await RolePrivileges.find({ role_id: body._id });
