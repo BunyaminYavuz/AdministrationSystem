@@ -245,6 +245,13 @@ router.put("/update", auth.checkRoles("user_update"), async (req, res) => {
     if ( body.phone_number ) updates.phone_number = body.phone_number;
     if ( typeof body.is_active === "boolean" ) updates.is_active = body.is_active;
 
+
+    if (body._id == req.user.id) {
+      //throw new CustomError(Enum.HTTP_CODES.FORBIDDEN, i18n.translate("COMMON.UNAUTHORIZED_ACCESS", req.user.language), i18n.translate("COMMON.UNAUTHORIZED_ACCESS", req.user.language));
+      body.roles = null; // No self-privilege escalation
+    }
+
+
     if ( Array.isArray(body.roles) && body.roles.length > 0) {
       // userRoles => {role_id: "RoleId", user_id: "UserId"}
       // body.roles => ["RoleId", "RoleId", ...]
