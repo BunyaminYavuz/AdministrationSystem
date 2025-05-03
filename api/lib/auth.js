@@ -40,7 +40,7 @@ module.exports = function() {
                         last_name: user.last_name,
                         language: user.language,
                         roles: privileges,
-                        exp: parseInt(Date.now() / 1000) * config.JWT.EXPIRE_TIME 
+                        exp: parseInt(Date.now() / 1000) + config.JWT.EXPIRE_TIME 
                     });
     
                 } else {

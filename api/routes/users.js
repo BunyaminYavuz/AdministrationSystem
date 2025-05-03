@@ -116,7 +116,7 @@ router.post("/auth", limiter, async (req, res) => {
     
       let payload = {
         id: user.id,
-        exp: parseInt(Date.now() / 1000) * config.JWT.EXPIRE_TIME
+        exp: parseInt(Date.now() / 1000) + config.JWT.EXPIRE_TIME
       };
 
       let token = jwt.sign(payload, config.JWT.SECRET);
